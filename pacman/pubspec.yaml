@@ -39,6 +39,7 @@ dependencies:
   flame: ^1.10.0
   tiled: ^0.10.1
   flame_tiled: ^1.15.0
+  flame_svg: ^1.8.5
 
 dev_dependencies:
   flutter_test:
@@ -58,6 +59,7 @@ dev_dependencies:
 flutter:
   assets:
     - assets/images/
+    - assets/tiles/
 
   # The following line ensures that the Material Icons font is
   # included with your application, so that you can use the icons in

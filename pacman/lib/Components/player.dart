@@ -1,16 +1,23 @@
+
+
 import 'package:flame/collisions.dart';
 import 'package:flame/components.dart';
 import 'package:flame/src/events/messages/drag_update_event.dart';
 import 'package:flame/sprite.dart';
 import 'dart:math';
 
+
  
 class Player extends SpriteAnimationComponent  with HasGameRef {
  Player(this.joystick)
-     : super(size: Vector2.all(100.0), anchor: Anchor.center);
-  double maxSpeed = 300.0;
+     : super(size: Vector2.all(30.0), anchor: Anchor.centerLeft, position: Vector2(482, 431) );
+  double maxSpeed = 25.0;
+//right tunnel x = 930  left -2?
+// 1100, 530
 
+// [482.6272500000005,431.76087500000045] spawn
   final JoystickComponent joystick;
+  
   final double _animationSpeed = .05;
   late final SpriteAnimation _runDownAnimation;
   late final SpriteAnimation _runLeftAnimation;
@@ -18,16 +25,23 @@ class Player extends SpriteAnimationComponent  with HasGameRef {
   late final SpriteAnimation _runRightAnimation;
   late final SpriteAnimation _standingAnimation;
   Vector2 currentMove = Vector2(0,0);
- 
+
  @override
  Future<void> onLoad() async {
    await _loadAnimations().then((_) => {animation = _standingAnimation});
+   
+     // size[0] = gameRef.size[0]/33;
+     // size[1] = gameRef.size[1]/21;
+   //sprite!.originalSize
+   //size.scale(.4);
+
 }
 
 Future<void> _loadAnimations() async {
    final spriteSheet = SpriteSheet(
-     image: await gameRef.images.load('player_movement.png'),
+     image: await gameRef.images.load('Player_movement.png'),
      srcSize: Vector2(32, 32),
+    
    );
  
    _runDownAnimation =
@@ -49,6 +63,7 @@ Future<void> _loadAnimations() async {
  @override
   void update(double dt) {
     super.update(dt); //player movement
+    print(position);
     if (joystick.direction != JoystickDirection.idle) {
       if (joystick.direction == JoystickDirection.up || joystick.relativeDelta[1] < 0 && pow(joystick.relativeDelta[1],2) > pow(joystick.relativeDelta[0],2)){
         currentMove = Vector2(0,dt*-maxSpeed);
@@ -72,7 +87,7 @@ Future<void> _loadAnimations() async {
       }
     }
     else{
-      position.add(currentMove);
+      //position.add(currentMove);
     }
   }
 }
