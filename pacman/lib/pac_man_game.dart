@@ -1,20 +1,22 @@
-import 'dart:math';
 
-import 'package:flame/camera.dart';
-import 'package:flame/effects.dart';
 import 'package:flame/game.dart';
 import 'package:flame_tiled/flame_tiled.dart';
-import 'package:flutter/foundation.dart';
-import 'package:pacman/Components/world.dart';
-//import 'components/world_collidable.dart';
-//import 'helpers/map_loader.dart';
-//import 'package:flame/components.dart';
+import 'package:pacman/Components/Coin.dart';
+import 'package:pacman/Components/Movement/DownLeft.dart';
+import 'package:pacman/Components/Movement/DownRight.dart';
+import 'package:pacman/Components/Movement/LeftRightUp.dart';
+import 'package:pacman/Components/Movement/LeftRightDown.dart';
+import 'package:pacman/Components/Movement/UpDownLeft.dart';
+import 'package:pacman/Components/Movement/UpDownRight.dart';
+import 'package:pacman/Components/Movement/UpDownRightLeft.dart';
+import 'package:pacman/Components/Movement/UpLeft.dart';
+import 'package:pacman/Components/Movement/UpRight.dart';
+import 'package:pacman/Components/Wall.dart';
 import 'package:pacman/Components/player.dart';
 import 'package:flame/components.dart';
 import 'package:flame/palette.dart';
-import 'package:flutter/painting.dart';
 
-class PacMan extends FlameGame {
+class PacMan extends FlameGame with HasCollisionDetection {
   late final JoystickComponent joystick;
   //late TiledComponent mapComponent;
   late final CameraComponent cameraComponent;
@@ -27,7 +29,7 @@ class PacMan extends FlameGame {
     world = World();
     cameraComponent = CameraComponent.withFixedResolution(
        world: world,
-       width: 1200,
+       width: 1300,
        height: 600,
      );
      cameraComponent.viewfinder.anchor = Anchor.topLeft;
@@ -36,20 +38,32 @@ class PacMan extends FlameGame {
 
     var mapComponent = await TiledComponent.load('map.tmx', Vector2(32, 32));
     await world.add(mapComponent);
-    
-
-   // addAll([world, cameraComponent]);
-    //camera.viewport = FixedResolutionViewport(resolution: Vector2(1200, 1200));
-    //add(camera);
+      List<TiledObject> coins =  mapComponent.tileMap.getLayer<ObjectGroup>("Coins")!.objects;
+     for (var coinObject in coins){ 
+       world.add(Coin(coin: coinObject));
+     }
+    world.add(Wall(mapComponent));
+    world.add(UpDownrightLeft(mapComponent));
+    world.add(DownRight(mapComponent));
+    world.add(DownLeft(mapComponent));
+    world.add(LeftRightUp(mapComponent));
+    world.add(UpDownLeft(mapComponent));
+    world.add(UpDownRight(mapComponent));
+    world.add(LeftRightDown(mapComponent));
+    world.add(UpLeft(mapComponent));
+    world.add(UpRight(mapComponent));
+   
+      //ObjectGroup Coins = mapComponent.tileMap.map.tileByLocalId("Assets", 2)?.objectGroup as ObjectGroup;
+   // await world.add(walls);
     final knobPaint = BasicPalette.blue.withAlpha(200).paint();
     final backgroundPaint = BasicPalette.blue.withAlpha(100).paint();
     joystick = JoystickComponent(
-       size: 200,
-       position: Vector2(1100, 530),
-       knob: CircleComponent(radius: 30, paint: knobPaint),
-       background: CircleComponent(radius: 60, paint: backgroundPaint),
+       size: 300,
+       position: Vector2(1150, 400),
+       knob: CircleComponent(radius: 40, paint: knobPaint),
+       background: CircleComponent(radius: 80, paint: backgroundPaint),
     );
-    final Player player = Player(joystick);
+    final Player player = Player(joystick, mapComponent);
     await world.add(player);
     await world.add(joystick);
   }

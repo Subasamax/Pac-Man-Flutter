@@ -1,8 +1,4 @@
 {
-    "Map/SizeTest": {
-        "height": 4300,
-        "width": 2
-    },
     "activeFile": "map.tmx",
     "expandedProjectPaths": [
     ],
@@ -14,36 +10,43 @@
         "#Assets": {
             "scaleInDock": 1
         },
+        ":/automap-tiles.tsx": {
+            "scaleInDock": 1
+        },
         "map.tmx": {
-            "scale": 1.021435546875,
-            "selectedLayer": 0,
+            "scale": 1.5,
+            "selectedLayer": 3,
             "viewCenter": {
-                "x": 452.3046034705292,
-                "y": 306.9209809264305
+                "x": 490.33333333333326,
+                "y": 331.66666666666663
             }
         },
         "map.tmx#Assets": {
-            "scaleInDock": 1
+            "scaleInDock": 1,
+            "scaleInEditor": 1
         },
         "map.tmx#Coin": {
             "scaleInEditor": 1
+        },
+        "map_2.tmx": {
+            "scale": 1.35375,
+            "selectedLayer": 4,
+            "viewCenter": {
+                "x": 456.8790397045245,
+                "y": 301.01569713758073
+            }
+        },
+        "map_2.tmx#Assets": {
+            "scaleInDock": 1
         }
     },
-    "last.imagePath": "C:/Users/subas/OneDrive/Desktop/GitHub/Pac_Man/Pac-Man-Flutter/pacman/assets/Images",
-    "map.height": 20,
     "map.lastUsedFormat": "tmx",
-    "map.layerDataFormat": null,
-    "map.width": 32,
     "openFiles": [
         "map.tmx"
     ],
-    "project": "map.tmx.tiled-project",
+    "project": "",
     "recentFiles": [
-        "map.tmx"
-    ],
-    "tileset.embedInMap": true,
-    "tileset.tileSize": {
-        "height": 32,
-        "width": 32
-    }
+        "map.tmx",
+        "map_2.tmx"
+    ]
 }
