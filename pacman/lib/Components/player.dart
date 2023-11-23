@@ -17,6 +17,8 @@ import 'package:pacman/Components/Movement/UpDownRight.dart';
 import 'package:pacman/Components/Movement/UpDownRightLeft.dart';
 import 'package:pacman/Components/Movement/UpLeft.dart';
 import 'package:pacman/Components/Movement/UpRight.dart';
+import 'package:pacman/Components/TeleportLeft.dart';
+import 'package:pacman/Components/TeleportRight.dart';
 import 'dart:math';
 
 import 'package:pacman/Components/Wall.dart';
@@ -28,7 +30,7 @@ import 'package:pacman/Components/Wall.dart';
 class Player extends SpriteAnimationComponent  with CollisionCallbacks, HasGameRef {
  Player(this.joystick, this.map)
      : super(size: Vector2.all(24), anchor: Anchor.center, position: Vector2(496, 432) );
-  double maxSpeed = 55.0;
+  double maxSpeed = 50.0;
   
   
 //right tunnel x = 930  left -2?
@@ -83,7 +85,7 @@ class Player extends SpriteAnimationComponent  with CollisionCallbacks, HasGameR
    add(RectangleHitbox());
    add(RectangleHitbox(
     position: Vector2(12,12),
-    size: Vector2.all(.01),
+    size: Vector2.all(1),
     anchor: Anchor.center,
     isSolid: false
    ));
@@ -146,9 +148,8 @@ Future<void> _loadAnimations() async {
 
  @override
   void update(double dt) {
-    
     CurrentPosition = position;
-    //print(position);
+   
     if (joystick.direction != JoystickDirection.idle && wallCollision == false) {
       if (((joystick.direction == JoystickDirection.up || joystick.relativeDelta[1] < 0 && pow(joystick.relativeDelta[1],2) > pow(joystick.relativeDelta[0],2)) )){
            MovDirection = JoystickDirection.up;
@@ -300,6 +301,12 @@ void onCollision(Set<Vector2> intersectionPoints, PositionComponent other) {
    }
   else if (other is Coin ){
     other.removeFromParent();
+  }
+  else if (other is TeleportLeft){
+     position = Vector2(80,304);
+  }
+  else if (other is TeleportRight){
+    position = Vector2(940,304);
   }
    
 

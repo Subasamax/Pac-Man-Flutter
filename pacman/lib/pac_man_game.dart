@@ -2,6 +2,7 @@
 import 'package:flame/game.dart';
 import 'package:flame_tiled/flame_tiled.dart';
 import 'package:pacman/Components/Coin.dart';
+import 'package:pacman/Components/Ghost.dart';
 import 'package:pacman/Components/Movement/DownLeft.dart';
 import 'package:pacman/Components/Movement/DownRight.dart';
 import 'package:pacman/Components/Movement/LeftRightUp.dart';
@@ -11,6 +12,8 @@ import 'package:pacman/Components/Movement/UpDownRight.dart';
 import 'package:pacman/Components/Movement/UpDownRightLeft.dart';
 import 'package:pacman/Components/Movement/UpLeft.dart';
 import 'package:pacman/Components/Movement/UpRight.dart';
+import 'package:pacman/Components/TeleportLeft.dart';
+import 'package:pacman/Components/TeleportRight.dart';
 import 'package:pacman/Components/Wall.dart';
 import 'package:pacman/Components/player.dart';
 import 'package:flame/components.dart';
@@ -52,9 +55,13 @@ class PacMan extends FlameGame with HasCollisionDetection {
     world.add(LeftRightDown(mapComponent));
     world.add(UpLeft(mapComponent));
     world.add(UpRight(mapComponent));
-   
-      //ObjectGroup Coins = mapComponent.tileMap.map.tileByLocalId("Assets", 2)?.objectGroup as ObjectGroup;
-   // await world.add(walls);
+    world.add(Ghost(1));
+    world.add(Ghost(2));
+    world.add(Ghost(3));
+    world.add(Ghost(4));
+    world.add(TeleportLeft(mapComponent));
+    world.add(TeleportRight(mapComponent));
+    print("got it");
     final knobPaint = BasicPalette.blue.withAlpha(200).paint();
     final backgroundPaint = BasicPalette.blue.withAlpha(100).paint();
     joystick = JoystickComponent(

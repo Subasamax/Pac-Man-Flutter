@@ -15,10 +15,10 @@
         },
         "map.tmx": {
             "scale": 1.5,
-            "selectedLayer": 3,
+            "selectedLayer": 11,
             "viewCenter": {
-                "x": 490.33333333333326,
-                "y": 331.66666666666663
+                "x": 489.6666666666667,
+                "y": 330.33333333333337
             }
         },
         "map.tmx#Assets": {

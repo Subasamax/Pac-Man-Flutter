@@ -15,8 +15,8 @@ class UpRight extends ShapeComponent with  HasGameRef, CollisionCallbacks{
     }
     for (var mov in wall){
       add(RectangleHitbox(
-        position: Vector2(mov.x+16, mov.y-16),
-        size: Vector2.all(1),
+        position: Vector2(mov.x+13.5, mov.y-18.5),
+        size: Vector2.all(5),
         isSolid: true
         ));
     }  
