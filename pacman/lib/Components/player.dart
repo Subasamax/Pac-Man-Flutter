@@ -17,26 +17,18 @@ import 'package:pacman/Components/Movement/UpDownRight.dart';
 import 'package:pacman/Components/Movement/UpDownRightLeft.dart';
 import 'package:pacman/Components/Movement/UpLeft.dart';
 import 'package:pacman/Components/Movement/UpRight.dart';
-import 'package:pacman/Components/TeleportLeft.dart';
-import 'package:pacman/Components/TeleportRight.dart';
+import 'package:pacman/Components/Movement/TeleportLeft.dart';
+import 'package:pacman/Components/Movement/TeleportRight.dart';
 import 'dart:math';
 
 import 'package:pacman/Components/Wall.dart';
+import 'package:pacman/Components/WhiteCoin.dart';
 
-
-
-
- 
 class Player extends SpriteAnimationComponent  with CollisionCallbacks, HasGameRef {
  Player(this.joystick, this.map)
      : super(size: Vector2.all(24), anchor: Anchor.center, position: Vector2(496, 432) );
-  double maxSpeed = 50.0;
-  
-  
-//right tunnel x = 930  left -2?
-// 1100, 530
+  double maxSpeed = 60.0;
 
-// [482.6272500000005,431.76087500000045] spawn
   final JoystickComponent joystick;
   late JoystickComponent  currentJoystickDir;
   TiledComponent map;
@@ -46,6 +38,15 @@ class Player extends SpriteAnimationComponent  with CollisionCallbacks, HasGameR
   late final SpriteAnimation _runUpAnimation;
   late final SpriteAnimation _runRightAnimation;
   late final SpriteAnimation _standingAnimation;
+  late final SpriteAnimation _runDownAnimationInvincible;
+  late final SpriteAnimation _runLeftAnimationInvincible;
+  late final SpriteAnimation _runUpAnimationInvincible;
+  late final SpriteAnimation _runRightAnimationInvincible;
+  late  SpriteAnimation _runDown;
+  late  SpriteAnimation _runLeft;
+  late  SpriteAnimation _runUp;
+  late  SpriteAnimation _runRight;
+ 
   Vector2 currentMove = Vector2(0,0);
   Vector2 CurrentPosition = Vector2(0,0);
   bool collided = false;
@@ -70,11 +71,13 @@ class Player extends SpriteAnimationComponent  with CollisionCallbacks, HasGameR
   Vector2 IntersectPos = Vector2(0, 0);
   Vector2 Pos = Vector2(0, 0);
   var wallCollision = false;
+  bool Invincible = false;
+  bool resetGame = false;
+  int life = 3;
+  int score = 0;
+  int Inviincible_Timer = -1;
+  int coinsCollected = 0;
 
-
-
-
-  
 
  @override
  Future<void> onLoad() async {
@@ -90,18 +93,18 @@ class Player extends SpriteAnimationComponent  with CollisionCallbacks, HasGameR
     isSolid: false
    ));
    currentJoystickDir = joystick;
-  
-   
-     // size[0] = gameRef.size[0]/33;
-     // size[1] = gameRef.size[1]/21;
-   //sprite!.originalSize
-   //size.scale(.4);
 
 }
 
 Future<void> _loadAnimations() async {
    final spriteSheet = SpriteSheet(
      image: await gameRef.images.load('Player_movement.png'),
+     srcSize: Vector2(32, 32),
+    
+   );
+
+    final spriteSheetInvincible = SpriteSheet(
+     image: await gameRef.images.load('Invincible_Mode.png'),
      srcSize: Vector2(32, 32),
     
    );
@@ -117,10 +120,79 @@ Future<void> _loadAnimations() async {
  
   _runRightAnimation =
        spriteSheet.createAnimation(row: 0, stepTime: _animationSpeed, to: 7);
+  
   _standingAnimation = 
         spriteSheet.createAnimation(row: 0, stepTime: _animationSpeed, to: 1);
+ 
+  _runDownAnimationInvincible =
+       spriteSheetInvincible.createAnimation(row: 3, stepTime: _animationSpeed, to: 6);
+  
+   _runLeftAnimationInvincible =
+       spriteSheetInvincible.createAnimation(row: 2, stepTime: _animationSpeed, to: 7);
+ 
+  _runUpAnimationInvincible =
+       spriteSheetInvincible.createAnimation(row: 1, stepTime: _animationSpeed, to: 7);
+ 
+  _runRightAnimationInvincible =
+       spriteSheetInvincible.createAnimation(row: 0, stepTime: _animationSpeed, to: 7);
+  
+  _runDown =  _runDownAnimation;
+  _runLeft =  _runLeftAnimation;
+  _runUp =  _runUpAnimation;
+  _runRight =  _runRightAnimation;
   current = _standingAnimation;
  
+ }
+
+
+  void swapAnimations(){
+  if (_runLeft == _runLeftAnimation){
+    _runDown =  _runDownAnimationInvincible;
+    _runLeft =  _runLeftAnimationInvincible;
+    _runUp =  _runUpAnimationInvincible;
+    _runRight =  _runRightAnimationInvincible;
+    if (current == _runDownAnimation){
+      animation = _runDown;
+      current = _runDown;
+    }
+    else if (current == _runLeftAnimation){
+      animation = _runLeft;
+      current = _runLeft;
+    }
+     else if (current == _runUpAnimation){
+      animation = _runUp;
+      current = _runUp;
+    }
+     else if (current == _runRightAnimation){
+      animation = _runRight;
+      current = _runRight;
+    }
+  }
+  else{
+    _runDown =  _runDownAnimation;
+    _runLeft =  _runLeftAnimation;
+    _runUp =  _runUpAnimation;
+    _runRight =  _runRightAnimation;
+  }
+
+
+
+}
+
+
+
+ void reset(){
+  position =  Vector2(496, 432);
+  Direction = JoystickDirection.idle;
+  currentPossibleMoves = LeftRight;
+  current = _standingAnimation;
+  _runDown =  _runDownAnimation;
+  _runLeft =  _runLeftAnimation;
+  _runUp =  _runUpAnimation;
+  _runRight =  _runRightAnimation;
+  Inviincible_Timer = -1;
+  Invincible = false;
+  resetGame = false;
  }
 
   void PassiveMove(JoystickDirection mov, double dt){
@@ -149,6 +221,20 @@ Future<void> _loadAnimations() async {
  @override
   void update(double dt) {
     CurrentPosition = position;
+    if (resetGame){
+      reset();
+    }
+    if (Inviincible_Timer > 0){
+      Inviincible_Timer--;
+      if (Inviincible_Timer < 150 && Inviincible_Timer % 15 == 0){
+        swapAnimations();
+      }
+    }
+    else if(Inviincible_Timer == 0){
+      Invincible = false;
+      swapAnimations();
+      Inviincible_Timer = -1;
+    }
    
     if (joystick.direction != JoystickDirection.idle && wallCollision == false) {
       if (((joystick.direction == JoystickDirection.up || joystick.relativeDelta[1] < 0 && pow(joystick.relativeDelta[1],2) > pow(joystick.relativeDelta[0],2)) )){
@@ -168,32 +254,32 @@ Future<void> _loadAnimations() async {
           currentPossibleMoves = DownUp;
           currentMove = Vector2(0,dt*-maxSpeed);
           position.add(currentMove);
-          animation = _runUpAnimation;
-          current = _runUpAnimation;
+          animation = _runUp;
+          current = _runUp;
           Direction = JoystickDirection.up;
         }
         else if (MovDirection == JoystickDirection.right){
           currentPossibleMoves = LeftRight;
           currentMove = Vector2(dt * maxSpeed, 0);
           position.add(currentMove);
-          animation = _runRightAnimation;
-          current = _runRightAnimation;
+          animation = _runRight;
+          current = _runRight;
           Direction = JoystickDirection.right;
         }
         else if (MovDirection == JoystickDirection.left){
           currentPossibleMoves = LeftRight;
           currentMove =Vector2(dt * -maxSpeed, 0);
           position.add(currentMove);
-          animation = _runLeftAnimation;
-          current = _runLeftAnimation;
+          animation = _runLeft;
+          current = _runLeft;
           Direction = JoystickDirection.left;
         }
         else if (MovDirection == JoystickDirection.down){
           currentPossibleMoves = DownUp;
           currentMove = Vector2(0,dt*maxSpeed);
           position.add(currentMove);
-          animation = _runDownAnimation;
-          current = _runDownAnimation;
+          animation = _runDown;
+          current = _runDown;
           Direction = JoystickDirection.down;
         }
       }
@@ -301,12 +387,23 @@ void onCollision(Set<Vector2> intersectionPoints, PositionComponent other) {
    }
   else if (other is Coin ){
     other.removeFromParent();
+    score += 10;
+    coinsCollected++;
   }
   else if (other is TeleportLeft){
      position = Vector2(80,304);
   }
   else if (other is TeleportRight){
     position = Vector2(940,304);
+  }
+  else if (other is WhiteCoin){
+    other.removeFromParent();
+    Invincible = true;
+    Inviincible_Timer = 400;
+    score += 50;
+    coinsCollected++;
+    swapAnimations();
+
   }
    
 
@@ -331,88 +428,6 @@ void onCollision(Set<Vector2> intersectionPoints, PositionComponent other) {
       else if (Direction == JoystickDirection.right){
          currentPossibleMoves = LeftRight;
       }
-
-
-      //CollidedDirection = JoystickDirection.idle;
-      //CollidedDirection = JoystickDirection.idle;
-    //print (collided);
-    
-    // TODO 2
   }
 }
 
-
-
-
- /*
-        
-        */
-
-
-
-
-/*
-
-@override
-  void update(double dt) {
-    super.update(dt); //player movement
-    CurrentPosition = position;
-    //print(position);
-    if (joystick.direction != JoystickDirection.idle) {
-      if (((CollidedDirection != JoystickDirection.up) && (joystick.direction == JoystickDirection.up || joystick.relativeDelta[1] < 0 && pow(joystick.relativeDelta[1],2) > pow(joystick.relativeDelta[0],2)) )){
-           
-          currentMove = Vector2(0,dt*-maxSpeed);
-          position.add(currentMove);
-          animation = _runUpAnimation;
-          current = _runUpAnimation;
-          MovDirection = JoystickDirection.up;
-          idleCollidedDirection = JoystickDirection.idle;   
-                
-      }
-      else if ((CollidedDirection != JoystickDirection.left) &&(joystick.direction == JoystickDirection.left || joystick.relativeDelta[0] < 0 && pow(joystick.relativeDelta[0],2) > pow(joystick.relativeDelta[1],2))){
-        currentMove =Vector2(dt * -maxSpeed, 0);
-        position.add(currentMove);
-         animation = _runLeftAnimation;
-         current = _runLeftAnimation;
-           MovDirection = JoystickDirection.left;
-           idleCollidedDirection = JoystickDirection.idle;
-      }
-       else if ((CollidedDirection != JoystickDirection.right) && (joystick.direction == JoystickDirection.right || joystick.relativeDelta[0] > 0 && pow(joystick.relativeDelta[0],2) > pow(joystick.relativeDelta[1],2))){
-        currentMove = Vector2(dt * maxSpeed, 0);
-        position.add(currentMove);
-        animation = _runRightAnimation;
-        current = _runRightAnimation;
-          MovDirection = JoystickDirection.right;
-          idleCollidedDirection = JoystickDirection.idle;
-      }
-      else if ((CollidedDirection != JoystickDirection.down) &&  (joystick.direction == JoystickDirection.down || joystick.relativeDelta[1] > 0 && pow(joystick.relativeDelta[1],2) > pow(joystick.relativeDelta[0],2))){
-            currentMove = Vector2(0,dt*maxSpeed);
-            position.add(currentMove);
-            animation = _runDownAnimation;
-            current = _runDownAnimation;
-            MovDirection = JoystickDirection.down;
-            idleCollidedDirection = JoystickDirection.idle;
-            
-      }
-    }
-    else if (joystick.direction == JoystickDirection.idle && collided == false){
-      if (MovDirection == JoystickDirection.up && idleCollidedDirection != JoystickDirection.up){
-        currentMove = Vector2(0,dt*-maxSpeed);
-        position.add(currentMove);
-      }
-      else if (MovDirection == JoystickDirection.left && idleCollidedDirection != JoystickDirection.left){
-        currentMove =Vector2(dt * -maxSpeed, 0);
-        position.add(currentMove);
-      }
-       else if (MovDirection == JoystickDirection.right && idleCollidedDirection != JoystickDirection.right){
-        currentMove = Vector2(dt * maxSpeed, 0);
-        position.add(currentMove);
-      }
-      else if (MovDirection == JoystickDirection.down && idleCollidedDirection != JoystickDirection.down){
-        currentMove = Vector2(0,dt*maxSpeed);
-        position.add(currentMove);
-      }
-      animation = current;
-    }
-  }
-*/

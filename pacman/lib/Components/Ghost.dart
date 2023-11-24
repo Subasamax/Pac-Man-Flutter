@@ -10,12 +10,13 @@ import 'package:pacman/Components/Movement/UpDownRight.dart';
 import 'package:pacman/Components/Movement/UpDownRightLeft.dart';
 import 'package:pacman/Components/Movement/UpLeft.dart';
 import 'package:pacman/Components/Movement/UpRight.dart';
-import 'package:pacman/Components/TeleportLeft.dart';
-import 'package:pacman/Components/TeleportRight.dart';
+import 'package:pacman/Components/Movement/TeleportLeft.dart';
+import 'package:pacman/Components/Movement/TeleportRight.dart';
 import 'dart:math';
 import 'package:pacman/Components/Wall.dart';
+import 'package:pacman/Components/player.dart';
 
-class Ghost extends SpriteComponent  with CollisionCallbacks, HasGameRef {
+class Ghost extends SpriteComponent with CollisionCallbacks, HasGameRef {
 Ghost(this.ghost);
 
 
@@ -24,8 +25,10 @@ Ghost(this.ghost);
   int ghost;
   double maxSpeed = 60.0;
   int timer = 0;
+  int startTimer = 0;
   Vector2 currentMove = Vector2(0,0);
   Vector2 CurrentPosition = Vector2(0,0);
+  Vector2 StartPosition = Vector2(0,0);
 
   List<JoystickDirection> LeftRightDownUp = [JoystickDirection.left,JoystickDirection.right, JoystickDirection.down,JoystickDirection.up];
   List<JoystickDirection> LeftRight = [JoystickDirection.left,JoystickDirection.right];
@@ -49,6 +52,7 @@ Ghost(this.ghost);
   bool start = true;
   bool infinite = true;
   bool newMove = false;
+  bool resetGame = false;
   int randNumber = 0;
   Random random = Random();
  
@@ -59,36 +63,43 @@ Ghost(this.ghost);
  Future<void> onLoad() async {
     await super.onLoad();
     if (ghost == 1){
+    
+
+
        sprite = await gameRef.loadSprite("Red_Ghost.png")..srcSize = Vector2.all(32);
        timer = 50;
-       position = Vector2(500, 345);
+      StartPosition = Vector2(500, 340);
+       position = Vector2(500, 340);
        size =  Vector2.all(24);
        anchor = Anchor.center;
+
     }
     else if (ghost == 2){
-       sprite = await gameRef.loadSprite("Blue_Ghost.png")..srcSize = Vector2.all(32);
-       timer = 100;
-        position = Vector2(500, 345);
-       size =  Vector2.all(24);
-       anchor = Anchor.center;
+      sprite = await gameRef.loadSprite("Blue_Ghost.png")..srcSize = Vector2.all(32);
+      timer = 100;
+      position = Vector2(525, 340);
+      StartPosition = Vector2(525, 340);
+      size =  Vector2.all(24);
+      anchor = Anchor.center;
     }
     else if (ghost == 3){
       sprite = await gameRef.loadSprite("Orange_Ghost.png")..srcSize = Vector2.all(32);
       timer = 150;
-       position = Vector2(500, 345);
+       position = Vector2(500, 360);
+      StartPosition = Vector2(500, 360);
        size =  Vector2.all(24);
        anchor = Anchor.center;
     }
     else if (ghost == 4){
       sprite = await gameRef.loadSprite("Pink_Ghost.png")..srcSize = Vector2.all(32);
       timer = 200;
-       position = Vector2(500, 345);
+       position = Vector2(525, 360);
+       StartPosition = Vector2(525, 360);
        size =  Vector2.all(24);
        anchor = Anchor.center;
     }
-    
 
-
+    startTimer = timer;
    add(RectangleHitbox());
    add(RectangleHitbox(
     position: Vector2(12,12),
@@ -157,6 +168,15 @@ Ghost(this.ghost);
     return Moves[randNumber] ;
   }
 
+   void softReset(){
+       position = StartPosition;
+       timer = startTimer;
+       Direction = JoystickDirection.idle;
+       PastDirection = JoystickDirection.idle;
+       currentPossibleMoves = LeftRight;
+       start = true;
+   }
+
 
  @override
   void update(double dt) {
@@ -214,7 +234,7 @@ Ghost(this.ghost);
     super.onCollision(intersectionPoints, other);
     IntersectPos= Vector2(intersectionPoints.elementAt(0)[0].toInt().toDouble(), intersectionPoints.elementAt(0)[1].toInt().toDouble());
     Pos= Vector2(position[0].toInt().toDouble(), position[1].toInt().toDouble());
-    if (other is Wall ){
+    if (other is Wall && !start){
       if (!collided ){
           wallCollision = true;
           collided = true;
@@ -232,7 +252,7 @@ Ghost(this.ghost);
           }
           else{
             position = CurrentPosition;
-          } 
+          }
         }
       
     }
@@ -313,6 +333,23 @@ Ghost(this.ghost);
     }
     else if (other is TeleportRight){
       position = Vector2(940,304);
+    }
+    else if (other is Player){
+      if (other.Invincible){
+        position = StartPosition;
+        timer = 200;
+        start = true;
+        other.score += 100;
+        Direction = JoystickDirection.idle;
+        PastDirection = JoystickDirection.idle;
+        currentPossibleMoves = LeftRight;
+      }
+      else{
+        other.life--;
+        other.resetGame = true;
+        //softReset();
+        
+      }
     }
   }
 

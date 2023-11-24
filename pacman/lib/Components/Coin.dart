@@ -7,9 +7,7 @@ import 'package:pacman/Components/player.dart';
 class Coin extends SpriteComponent with CollisionCallbacks, HasGameRef{
   Coin({required this.coin});
    TiledObject coin;
-
- 
-
+   bool valid = true;
   @override
   Future<void> onLoad() async{
     
