@@ -1,6 +1,7 @@
 
 // ignore_for_file: non_constant_identifier_names
 
+
 import 'package:flame/game.dart';
 import 'package:flame_tiled/flame_tiled.dart';
 import 'package:flutter/material.dart';
@@ -25,10 +26,11 @@ import 'package:flame/components.dart';
 import 'package:flame/palette.dart';
 
 class PacMan extends FlameGame with HasCollisionDetection {
+  PacMan({required this.context});
   late final JoystickComponent joystick;
   late TiledComponent mapComponent;
   late final CameraComponent cameraComponent;
-
+  BuildContext context;
   
   @override
   late final World world;
@@ -161,12 +163,12 @@ class PacMan extends FlameGame with HasCollisionDetection {
 
    Future<void> GameOverMessage() async {
     world.add(GameOverText);
-    await Future.delayed(const Duration(milliseconds: 30));
+    Future.delayed(const Duration(milliseconds: 30));
     pauseEngine();
-    await Future.delayed(const Duration(seconds: 4));
+    Future.delayed(const Duration(seconds: 4));
     world.remove(GameOverText);
     resumeEngine();
-  
+    Navigator.pop(context);
   }
 
     

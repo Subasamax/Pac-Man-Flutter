@@ -20,7 +20,6 @@ import 'package:pacman/Components/Movement/UpRight.dart';
 import 'package:pacman/Components/Movement/TeleportLeft.dart';
 import 'package:pacman/Components/Movement/TeleportRight.dart';
 import 'dart:math';
-
 import 'package:pacman/Components/Wall.dart';
 import 'package:pacman/Components/WhiteCoin.dart';
 
@@ -73,7 +72,7 @@ class Player extends SpriteAnimationComponent  with CollisionCallbacks, HasGameR
   var wallCollision = false;
   bool Invincible = false;
   bool resetGame = false;
-  int life = 3;
+  int life = 0;
   int score = 0;
   int Inviincible_Timer = -1;
   int coinsCollected = 0;
@@ -232,6 +231,7 @@ Future<void> _loadAnimations() async {
     }
     else if(Inviincible_Timer == 0){
       Invincible = false;
+      maxSpeed = 60;
       swapAnimations();
       Inviincible_Timer = -1;
     }
@@ -400,14 +400,13 @@ void onCollision(Set<Vector2> intersectionPoints, PositionComponent other) {
     other.removeFromParent();
     Invincible = true;
     Inviincible_Timer = 400;
+    maxSpeed = 75;
     score += 50;
     coinsCollected++;
     swapAnimations();
 
   }
-   
-
-  // TODO 1
+  
 }
 
 
