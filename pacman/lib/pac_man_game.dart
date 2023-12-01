@@ -25,13 +25,16 @@ import 'package:pacman/Components/player.dart';
 import 'package:flame/components.dart';
 import 'package:flame/palette.dart';
 
+
+
 class PacMan extends FlameGame with HasCollisionDetection {
   PacMan({required this.context});
   late final JoystickComponent joystick;
   late TiledComponent mapComponent;
   late final CameraComponent cameraComponent;
   BuildContext context;
-  
+  final pauseOverlayIdentifier = 'GameOver';
+
   @override
   late final World world;
   Ghost red = Ghost(1);
@@ -126,7 +129,6 @@ class PacMan extends FlameGame with HasCollisionDetection {
 
   void hardReset(){
     GameOverMessage();
-    player.reset();
     for (var object in all_coins){
       if(object.isRemoved != false){
         world.add(object);
@@ -146,6 +148,9 @@ class PacMan extends FlameGame with HasCollisionDetection {
    player.reset();
   }
 
+
+  
+
   @override
   Future<void> onLoad() async {
     world = World();
@@ -162,13 +167,9 @@ class PacMan extends FlameGame with HasCollisionDetection {
   }
 
    Future<void> GameOverMessage() async {
-    world.add(GameOverText);
-    Future.delayed(const Duration(milliseconds: 30));
     pauseEngine();
-    Future.delayed(const Duration(seconds: 4));
-    world.remove(GameOverText);
-    resumeEngine();
-    Navigator.pop(context);
+    overlays.add(pauseOverlayIdentifier);
+    player.reset();
   }
 
     
@@ -176,9 +177,9 @@ class PacMan extends FlameGame with HasCollisionDetection {
   @override
   void update(double dt) {
     super.update(dt);
-   
+    Score = player.score;
     UI.Score = player.score;
-    if (player.life == -1){
+    if (player.life < 0){
       hardReset();    
     }
     else if (player.resetGame == true){
@@ -192,8 +193,6 @@ class PacMan extends FlameGame with HasCollisionDetection {
     UI.lives = player.life;
     
 
-  }
-    
-    
-  
+  }  
 }
+

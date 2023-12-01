@@ -7,6 +7,8 @@ class LEADERBOARD extends StatelessWidget {
   // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
+    double width = MediaQuery.of(context).size.width;
+    double height = MediaQuery.of(context).size.height;
     return  Scaffold(
       body: Center(
         // Center is a layout widget. It takes a single child and positions it
@@ -20,9 +22,45 @@ class LEADERBOARD extends StatelessWidget {
               style: TextStyle(fontSize: 50, color: Colors.yellow),
             ),
             SizedBox(
-              width: 300, // <-- Your width
-              height: 250, // <-- Your height
-              child: Column(
+              width: width/1.5, // <-- Your width
+              height: height/2, // <-- Your height    
+              child:Container(
+                color: Colors.grey,
+                child:const SingleChildScrollView(
+                  child: Column(
+                    children: [
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceAround,
+                        children: [
+                          Column(
+                             mainAxisAlignment: MainAxisAlignment.spaceAround,
+                            children: [
+                               Text("Username"),
+                               Text('Max'),
+                            ]
+                          ),
+                          Column(
+                             mainAxisAlignment: MainAxisAlignment.spaceAround,
+                            children: [
+                              Text("Score"),
+                              Text('1002334'),
+                            ]
+                          ),
+                          Column(
+                             mainAxisAlignment: MainAxisAlignment.spaceAround,
+                            children: [
+                              Text("Location"),
+                              Text('Chico'),
+                            ]
+                          ),
+                        ],
+                      )
+                    ],
+                  ), 
+                ), 
+              ) 
+            ),
+            Column(
                 mainAxisAlignment: MainAxisAlignment.end,
                 crossAxisAlignment: CrossAxisAlignment.center,
                 children: <Widget>[
@@ -41,7 +79,6 @@ class LEADERBOARD extends StatelessWidget {
                 
                 ]
               )
-            ),
           ],
         ),
       ),

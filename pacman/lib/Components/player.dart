@@ -404,7 +404,6 @@ void onCollision(Set<Vector2> intersectionPoints, PositionComponent other) {
     score += 50;
     coinsCollected++;
     swapAnimations();
-
   }
   
 }

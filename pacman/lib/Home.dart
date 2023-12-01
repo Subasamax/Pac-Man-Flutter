@@ -6,6 +6,8 @@ import 'package:flame/game.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:pacman/Leaderboard.dart';
+import 'package:pacman/Widgets/GameOver.dart';
+import 'package:pacman/Widgets/saveScore.dart';
 import 'package:pacman/pac_man_game.dart';
 
 class Home extends StatelessWidget {
@@ -87,7 +89,17 @@ class _MyHomePageState extends State<MyHomePage> {
                     onPressed: (){
                       Navigator.push(
                         context,
-                        MaterialPageRoute(builder: (context)=> GameWidget(game: PacMan(context: context)))
+                        MaterialPageRoute(builder: (context)=> GameWidget(
+                          game: PacMan(context: context),
+                          overlayBuilderMap: {
+                            'GameOver': (BuildContext context, PacMan gameRef) {
+                                return GameOver_UI(gameRef);
+                            },
+                            'SaveScore': (BuildContext context, PacMan gameRef) {
+                                return SaveScore_UI(gameRef);
+                            },
+                          },
+                        ))
                       );
                     },   // change to start game
                     style: ElevatedButton.styleFrom(
