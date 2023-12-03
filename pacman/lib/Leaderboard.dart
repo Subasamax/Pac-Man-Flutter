@@ -1,12 +1,65 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
+import 'package:pacman/Widgets/FirebaseStorage.dart';
 
 class LEADERBOARD extends StatelessWidget {
-  const LEADERBOARD({super.key});
-
+  LEADERBOARD({super.key});
+    final Fire_storage firebase = Fire_storage();
+    late final Future<QuerySnapshot<Object?>?> _list;
   // This widget is the root of your application.
+
+
+  List<Widget> getWidgets(List<Widget> wlist, AsyncSnapshot<QuerySnapshot<Object?>?> snapshot, BuildContext context) {
+    double width = MediaQuery.of(context).size.width;
+    double height = MediaQuery.of(context).size.height;
+    for (int i = 0; i < snapshot.data!.docs.length; i++) {
+      if (snapshot.data!.docs[i].id == 'LeaderboardSize'){
+        continue;
+      }
+      wlist.add(Row(
+        mainAxisAlignment: MainAxisAlignment.start,
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: <Widget>[
+          SizedBox(
+            width: width/4.5, // <-- Your width
+            height: 20, // <-- Your height 
+            child: Center(
+              widthFactor: width,
+              heightFactor: height,
+              child: Text(snapshot.data!.docs[i].get('DisplayName').toString()),    
+            ),
+          ),
+          SizedBox(
+            width: width/4.5, // <-- Your width
+            height: 20, // <-- Your height  
+             child: Center(
+              widthFactor: width,
+              heightFactor: height,
+              child: Text(snapshot.data!.docs[i].get('Score').toString()),  
+             ) 
+              
+          ),
+          SizedBox(
+              width: width/4.5, // <-- Your width
+              height: 20, // <-- Your height  
+               child: Center(
+              widthFactor: width,
+              heightFactor: height,
+              child: Text(snapshot.data!.docs[i].get('Location').toString()),
+              ),  
+          ),
+        ],
+      ));
+    }
+    return wlist;
+  }
+
+
   @override
   Widget build(BuildContext context) {
+     _list = firebase.readFirebaseForm();
+     List<Widget> widgetlist = []; 
+    
     double width = MediaQuery.of(context).size.width;
     double height = MediaQuery.of(context).size.height;
     return  Scaffold(
@@ -19,43 +72,44 @@ class LEADERBOARD extends StatelessWidget {
           children: <Widget>[
              const Text(
               'LEADERBOARD',
-              style: TextStyle(fontSize: 50, color: Colors.yellow),
+              style: TextStyle(fontSize: 30, color: Colors.black),
             ),
             SizedBox(
               width: width/1.5, // <-- Your width
               height: height/2, // <-- Your height    
               child:Container(
                 color: Colors.grey,
-                child:const SingleChildScrollView(
+                child: SingleChildScrollView(
                   child: Column(
                     children: [
-                      Row(
+                      Column(
                         mainAxisAlignment: MainAxisAlignment.spaceAround,
-                        children: [
-                          Column(
-                             mainAxisAlignment: MainAxisAlignment.spaceAround,
-                            children: [
-                               Text("Username"),
-                               Text('Max'),
+                         children: [
+                              const Row(
+                                mainAxisAlignment: MainAxisAlignment.spaceAround,
+                                children: [
+                                  Text("Username",  style: TextStyle(fontSize: 20, color: Colors.yellow)),
+                                  Text("Score",  style: TextStyle(fontSize: 20, color: Colors.yellow)),
+                                  Text("Location",  style: TextStyle(fontSize: 20, color: Colors.yellow)),
+                                ],
+                              ),
+                               FutureBuilder(
+                                 future: _list, 
+                                  builder: (BuildContext context, AsyncSnapshot<QuerySnapshot<Object?>?> snapshot){
+                                  if(snapshot.hasData){
+                                    widgetlist = getWidgets(widgetlist, snapshot, context);
+                                    return Column(
+                                      children: widgetlist.map((element) {
+                                       return element;
+                                    }).toList());
+                                  }
+                                  else {
+                                    return const CircularProgressIndicator();
+                                  }
+                                }),
                             ]
                           ),
-                          Column(
-                             mainAxisAlignment: MainAxisAlignment.spaceAround,
-                            children: [
-                              Text("Score"),
-                              Text('1002334'),
-                            ]
-                          ),
-                          Column(
-                             mainAxisAlignment: MainAxisAlignment.spaceAround,
-                            children: [
-                              Text("Location"),
-                              Text('Chico'),
-                            ]
-                          ),
-                        ],
-                      )
-                    ],
+                      ]
                   ), 
                 ), 
               ) 
