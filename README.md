@@ -9,4 +9,6 @@ Movement needs work as the ghosts will hit the walls and bounce off. This is bea
 
 
 
+### Disclaimer
+
 Project Created for Educational Purposes
