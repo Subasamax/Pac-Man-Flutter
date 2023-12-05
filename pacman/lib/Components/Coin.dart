@@ -12,7 +12,6 @@ class Coin extends SpriteComponent with CollisionCallbacks, HasGameRef{
   Future<void> onLoad() async{
     
     await super.onLoad();
-    
     sprite = await gameRef.loadSprite("Coin.png")..srcSize = Vector2.all(32);
     position = Vector2(coin.x+7, coin.y-25);
     size =  Vector2.all(18);
@@ -24,8 +23,9 @@ class Coin extends SpriteComponent with CollisionCallbacks, HasGameRef{
 void onCollision(Set<Vector2> intersectionPoints, PositionComponent other) {
   super.onCollision(intersectionPoints, other);
    if (other is Player ){
-       
-    
+    other.score += 10;
+    other.coinsCollected++; 
+    removeFromParent();
    }
 
   // TODO 1

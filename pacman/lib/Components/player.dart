@@ -8,6 +8,7 @@ import 'package:flame/sprite.dart';
 import 'package:flame_tiled/flame_tiled.dart';
 import 'package:flutter/foundation.dart';
 import 'package:pacman/Components/Coin.dart';
+import 'package:pacman/Components/Ghost.dart';
 import 'package:pacman/Components/Movement/DownLeft.dart';
 import 'package:pacman/Components/Movement/DownRight.dart';
 import 'package:pacman/Components/Movement/LeftRightDown.dart';
@@ -27,7 +28,7 @@ class Player extends SpriteAnimationComponent  with CollisionCallbacks, HasGameR
  Player(this.joystick, this.map)
      : super(size: Vector2.all(24), anchor: Anchor.center, position: Vector2(496, 432) );
   double maxSpeed = 60.0;
-
+  double speed = 60;
   final JoystickComponent joystick;
   late JoystickComponent  currentJoystickDir;
   TiledComponent map;
@@ -72,7 +73,7 @@ class Player extends SpriteAnimationComponent  with CollisionCallbacks, HasGameR
   var wallCollision = false;
   bool Invincible = false;
   bool resetGame = false;
-  int life = 0;
+  int life = 3;
   int score = 0;
   int Inviincible_Timer = -1;
   int coinsCollected = 0;
@@ -231,7 +232,7 @@ Future<void> _loadAnimations() async {
     }
     else if(Inviincible_Timer == 0){
       Invincible = false;
-      maxSpeed = 60;
+      maxSpeed = speed;
       swapAnimations();
       Inviincible_Timer = -1;
     }
@@ -386,9 +387,10 @@ void onCollision(Set<Vector2> intersectionPoints, PositionComponent other) {
     wallCollision = false;
    }
   else if (other is Coin ){
-    other.removeFromParent();
-    score += 10;
-    coinsCollected++;
+    // other.removeFromParent();
+    // score += 10;
+    // coinsCollected++;
+    // print(coinsCollected);
   }
   else if (other is TeleportLeft){
      position = Vector2(80,304);
@@ -397,13 +399,31 @@ void onCollision(Set<Vector2> intersectionPoints, PositionComponent other) {
     position = Vector2(940,304);
   }
   else if (other is WhiteCoin){
-    other.removeFromParent();
-    Invincible = true;
-    Inviincible_Timer = 400;
-    maxSpeed = 75;
-    score += 50;
-    coinsCollected++;
-    swapAnimations();
+    // other.removeFromParent();
+    // Invincible = true;
+    // Inviincible_Timer = 400;
+    // maxSpeed = 75;
+    // score += 50;
+    // coinsCollected++;
+    // print(coinsCollected);
+    // swapAnimations();
+  }
+  else if (other is Ghost){
+    if (Invincible){
+        other.position = other.StartPosition;
+        other.timer = 200;
+        other.start = true;
+        score += 100;
+        other.Direction = JoystickDirection.idle;
+        other.PastDirection = JoystickDirection.idle;
+        other.currentPossibleMoves = LeftRight;
+      }
+      else{
+        life--;
+        resetGame = true;
+        //softReset();
+        
+      }
   }
   
 }

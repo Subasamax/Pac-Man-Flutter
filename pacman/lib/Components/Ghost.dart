@@ -335,21 +335,21 @@ Ghost(this.ghost);
       position = Vector2(940,304);
     }
     else if (other is Player){
-      if (other.Invincible){
-        position = StartPosition;
-        timer = 200;
-        start = true;
-        other.score += 100;
-        Direction = JoystickDirection.idle;
-        PastDirection = JoystickDirection.idle;
-        currentPossibleMoves = LeftRight;
-      }
-      else{
-        other.life--;
-        other.resetGame = true;
-        //softReset();
+      // if (other.Invincible){
+      //   position = StartPosition;
+      //   timer = 200;
+      //   start = true;
+      //   other.score += 100;
+      //   Direction = JoystickDirection.idle;
+      //   PastDirection = JoystickDirection.idle;
+      //   currentPossibleMoves = LeftRight;
+      // }
+      // else{
+      //   other.life--;
+      //   other.resetGame = true;
+      //   //softReset();
         
-      }
+      // }
     }
   }
 

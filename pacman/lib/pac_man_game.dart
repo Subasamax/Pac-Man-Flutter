@@ -113,15 +113,12 @@ class PacMan extends FlameGame with HasCollisionDetection {
     world.add(player);
     world.add(joystick);
     world.add(UI);
-
   }
 
   void NextLevel(){
     player.reset();
     for (var object in all_coins){
-      if(object.isRemoved != false){
         world.add(object);
-      }
     }
     softReset();
   }
@@ -191,7 +188,6 @@ class PacMan extends FlameGame with HasCollisionDetection {
       NextLevel();
     }
     UI.lives = player.life;
-    
 
   }  
 }
