@@ -1,13 +1,9 @@
 
-
 // ignore_for_file: non_constant_identifier_names
-
 import 'package:flame/collisions.dart';
 import 'package:flame/components.dart';
 import 'package:flame/sprite.dart';
 import 'package:flame_tiled/flame_tiled.dart';
-import 'package:flutter/foundation.dart';
-import 'package:pacman/Components/Coin.dart';
 import 'package:pacman/Components/Ghost.dart';
 import 'package:pacman/Components/Movement/DownLeft.dart';
 import 'package:pacman/Components/Movement/DownRight.dart';
@@ -22,16 +18,19 @@ import 'package:pacman/Components/Movement/TeleportLeft.dart';
 import 'package:pacman/Components/Movement/TeleportRight.dart';
 import 'dart:math';
 import 'package:pacman/Components/Wall.dart';
-import 'package:pacman/Components/WhiteCoin.dart';
 
 class Player extends SpriteAnimationComponent  with CollisionCallbacks, HasGameRef {
  Player(this.joystick, this.map)
      : super(size: Vector2.all(24), anchor: Anchor.center, position: Vector2(496, 432) );
+  // sets speed values
   double maxSpeed = 60.0;
   double speed = 60;
+  
   final JoystickComponent joystick;
   late JoystickComponent  currentJoystickDir;
   TiledComponent map;
+  
+  // creates animation variables
   final double _animationSpeed = .05;
   late final SpriteAnimation _runDownAnimation;
   late final SpriteAnimation _runLeftAnimation;
@@ -47,15 +46,17 @@ class Player extends SpriteAnimationComponent  with CollisionCallbacks, HasGameR
   late  SpriteAnimation _runUp;
   late  SpriteAnimation _runRight;
  
+ // variables
   Vector2 currentMove = Vector2(0,0);
   Vector2 CurrentPosition = Vector2(0,0);
   bool collided = false;
   JoystickDirection CollidedDirection = JoystickDirection.idle;
-   JoystickDirection idleCollidedDirection = JoystickDirection.idle;
+  JoystickDirection idleCollidedDirection = JoystickDirection.idle;
   JoystickDirection MovDirection = JoystickDirection.idle;
   JoystickDirection Direction = JoystickDirection.idle;
   late SpriteAnimation current;
   
+  // lists of all posible move directions in the map
   List<JoystickDirection> LeftRightDownUp = [JoystickDirection.left,JoystickDirection.right, JoystickDirection.down,JoystickDirection.up];
   List<JoystickDirection> LeftRight = [JoystickDirection.left,JoystickDirection.right];
   List<JoystickDirection> DownUp = [JoystickDirection.down,JoystickDirection.up];
@@ -70,6 +71,8 @@ class Player extends SpriteAnimationComponent  with CollisionCallbacks, HasGameR
   List<JoystickDirection> currentPossibleMoves = [JoystickDirection.left,JoystickDirection.right];
   Vector2 IntersectPos = Vector2(0, 0);
   Vector2 Pos = Vector2(0, 0);
+
+  // sets timers, collision, life and score variables
   var wallCollision = false;
   bool Invincible = false;
   bool resetGame = false;
@@ -82,9 +85,7 @@ class Player extends SpriteAnimationComponent  with CollisionCallbacks, HasGameR
  @override
  Future<void> onLoad() async {
    await _loadAnimations().then((_) => {animation = _standingAnimation});
-    if (kDebugMode) {
-      //debugMode = true;
-    }
+   // adds hitbox for center of player plus the whole player
    add(RectangleHitbox());
    add(RectangleHitbox(
     position: Vector2(12,12),
@@ -95,7 +96,7 @@ class Player extends SpriteAnimationComponent  with CollisionCallbacks, HasGameR
    currentJoystickDir = joystick;
 
 }
-
+  // loads all animations for the player
 Future<void> _loadAnimations() async {
    final spriteSheet = SpriteSheet(
      image: await gameRef.images.load('Player_movement.png'),
@@ -144,7 +145,7 @@ Future<void> _loadAnimations() async {
  
  }
 
-
+// swaps the animations for the player between original and invincible
   void swapAnimations(){
   if (_runLeft == _runLeftAnimation){
     _runDown =  _runDownAnimationInvincible;
@@ -180,7 +181,7 @@ Future<void> _loadAnimations() async {
 }
 
 
-
+// reserts the player 
  void reset(){
   position =  Vector2(496, 432);
   Direction = JoystickDirection.idle;
@@ -195,6 +196,7 @@ Future<void> _loadAnimations() async {
   resetGame = false;
  }
 
+// moves passively in the direction without any input from player
   void PassiveMove(JoystickDirection mov, double dt){
        if (mov == JoystickDirection.up){
           currentMove = Vector2(0,dt*-maxSpeed);
@@ -221,22 +223,22 @@ Future<void> _loadAnimations() async {
  @override
   void update(double dt) {
     CurrentPosition = position;
-    if (resetGame){
+    if (resetGame){ // if resetgame reset
       reset();
     }
-    if (Inviincible_Timer > 0){
-      Inviincible_Timer--;
+    if (Inviincible_Timer > 0){ // if timer is greater than 0
+      Inviincible_Timer--; // decrement
       if (Inviincible_Timer < 150 && Inviincible_Timer % 15 == 0){
         swapAnimations();
       }
     }
-    else if(Inviincible_Timer == 0){
+    else if(Inviincible_Timer == 0){ // if 0, reset invincible status to false
       Invincible = false;
       maxSpeed = speed;
       swapAnimations();
       Inviincible_Timer = -1;
     }
-   
+    // gets movement direction of joystick
     if (joystick.direction != JoystickDirection.idle && wallCollision == false) {
       if (((joystick.direction == JoystickDirection.up || joystick.relativeDelta[1] < 0 && pow(joystick.relativeDelta[1],2) > pow(joystick.relativeDelta[0],2)) )){
            MovDirection = JoystickDirection.up;
@@ -250,6 +252,7 @@ Future<void> _loadAnimations() async {
       else if ((joystick.direction == JoystickDirection.down || joystick.relativeDelta[1] > 0 && pow(joystick.relativeDelta[1],2) > pow(joystick.relativeDelta[0],2))){
             MovDirection = JoystickDirection.down;
       }
+      // checks and determines new move direction
       if (currentPossibleMoves.contains(MovDirection)){
         if (MovDirection == JoystickDirection.up){
           currentPossibleMoves = DownUp;
@@ -285,11 +288,12 @@ Future<void> _loadAnimations() async {
         }
       }
       else{
-        
+        // passive moves if no collision
         if (collided == false) PassiveMove(Direction, dt);
       }
     }
     else{
+      // passive moves if no collisions
       if (collided == false) PassiveMove(Direction, dt);
     }
     super.update(dt); //player movement
@@ -301,9 +305,9 @@ Future<void> _loadAnimations() async {
 @override
 void onCollision(Set<Vector2> intersectionPoints, PositionComponent other) {
   super.onCollision(intersectionPoints, other);
-  IntersectPos= Vector2(intersectionPoints.elementAt(0)[0].toInt().toDouble(), intersectionPoints.elementAt(0)[1].toInt().toDouble());
-  Pos= Vector2(position[0].toInt().toDouble(), position[1].toInt().toDouble());
-   if (other is Wall ){
+  IntersectPos= Vector2(intersectionPoints.elementAt(0)[0].toInt().toDouble(), intersectionPoints.elementAt(0)[1].toInt().toDouble()); // gets collision pos
+  Pos= Vector2(position[0].toInt().toDouble(), position[1].toInt().toDouble()); // gets pos
+   if (other is Wall ){ // if wall, move opposite direction
     if (!collided ){
           wallCollision = true;
           collided = true;
@@ -326,6 +330,7 @@ void onCollision(Set<Vector2> intersectionPoints, PositionComponent other) {
         }
       
    }
+   //////////// Defines Movement Collisions ////////////////
    else if (other is UpDownrightLeft && Pos == IntersectPos){
      currentPossibleMoves = LeftRightDownUp;
      wallCollision = false;
@@ -386,43 +391,26 @@ void onCollision(Set<Vector2> intersectionPoints, PositionComponent other) {
     currentPossibleMoves = RightUp;
     wallCollision = false;
    }
-  else if (other is Coin ){
-    // other.removeFromParent();
-    // score += 10;
-    // coinsCollected++;
-    // print(coinsCollected);
-  }
-  else if (other is TeleportLeft){
+   /////////////// End define movement collisions /////////////
+  else if (other is TeleportLeft){  // if teleport update position
      position = Vector2(80,304);
   }
-  else if (other is TeleportRight){
+  else if (other is TeleportRight){ // if teleport update position
     position = Vector2(940,304);
   }
-  else if (other is WhiteCoin){
-    // other.removeFromParent();
-    // Invincible = true;
-    // Inviincible_Timer = 400;
-    // maxSpeed = 75;
-    // score += 50;
-    // coinsCollected++;
-    // print(coinsCollected);
-    // swapAnimations();
-  }
-  else if (other is Ghost){
-    if (Invincible){
-        other.position = other.StartPosition;
-        other.timer = 200;
-        other.start = true;
-        score += 100;
+  else if (other is Ghost){ // if ghost, check if invincible, if not lose a life and soft reset
+    if (Invincible){ // if invincible
+        other.position = other.StartPosition; // resets ghost pos
+        other.timer = 250; // sets timer
+        other.start = true; // sets start
+        score += 100; // add score
         other.Direction = JoystickDirection.idle;
         other.PastDirection = JoystickDirection.idle;
         other.currentPossibleMoves = LeftRight;
       }
       else{
-        life--;
-        resetGame = true;
-        //softReset();
-        
+        life--; // decrement life
+        resetGame = true; // sets reset game
       }
   }
   

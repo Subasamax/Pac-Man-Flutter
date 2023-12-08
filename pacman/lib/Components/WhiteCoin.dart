@@ -10,32 +10,25 @@ class WhiteCoin extends SpriteComponent with CollisionCallbacks, HasGameRef{
    bool valid = true;
   @override
   Future<void> onLoad() async{
-    
     await super.onLoad();
-    
     sprite = await gameRef.loadSprite("White_Coin.png")..srcSize = Vector2.all(32);
     position = Vector2(coin.x+7, coin.y-25);
     size =  Vector2.all(18);
     add(RectangleHitbox(size: Vector2.all(14)));
   }
 
-
-
-
   @override
-void onCollision(Set<Vector2> intersectionPoints, PositionComponent other) {
+  void onCollision(Set<Vector2> intersectionPoints, PositionComponent other) {
   super.onCollision(intersectionPoints, other);
-   if (other is Player ){
-    other.Invincible = true;
-    other.Inviincible_Timer = 400;
-    other.maxSpeed = 75;
-    other.score += 50;
-    other.coinsCollected++;
-    other.swapAnimations(); 
-    removeFromParent();    
+   if (other is Player ){ // if collision with player
+    other.Invincible = true; // sets player invincible
+    other.Inviincible_Timer = 400; // sets player timer
+    other.maxSpeed = 75; // sets player maxspeed
+    other.score += 50; // sets player score
+    other.coinsCollected++; // increments coins collected
+    other.swapAnimations();  // swaps their animations
+    removeFromParent();   // deletes from world
    }
-
-  // TODO 1
 }
 }
 

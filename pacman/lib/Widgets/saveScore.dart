@@ -69,6 +69,8 @@ class MySaveScore_UI extends State<SaveScore_UI> {
     return await Geolocator.getCurrentPosition();
   }
 
+  // Takes inspiration from link to get city and state
+// https://medium.com/@fernnandoptr/how-to-get-users-current-location-address-in-flutter-geolocator-geocoding-be563ad6f66a
   Future<void> _getAddressFromLatLng(Position ?position) async {
     await placemarkFromCoordinates(
       position!.latitude, position.longitude)
@@ -101,9 +103,9 @@ class MySaveScore_UI extends State<SaveScore_UI> {
   @override
     Widget build(BuildContext context) {
      
-     double width = MediaQuery.of(context).size.width;
-     double height = MediaQuery.of(context).size.height;
-         return  Center(
+     double width = MediaQuery.of(context).size.width; // gets size of context , typically screen
+     double height = MediaQuery.of(context).size.height; // gets size of context , typically screen
+         return  Center( // returns a center
           widthFactor: width/4,
           heightFactor: height/2,
           child: Container(
@@ -141,7 +143,7 @@ class MySaveScore_UI extends State<SaveScore_UI> {
                           style: TextStyle(fontSize: 30, color: Colors.red, decoration: TextDecoration.none),
                         ),
                         SizedBox(
-                           width: width/4, // <-- Your width
+                          width: width/4, // <-- Your width
                           height: height/10, // <-- Your height
                           child: TextField(
                             inputFormatters: <TextInputFormatter>[
@@ -156,9 +158,7 @@ class MySaveScore_UI extends State<SaveScore_UI> {
                               border:OutlineInputBorder(),
                               hintText: "Enter Display Name")
                           ),
-                        ),
-                        //ElevatedButton(onPressed: , child: const Text("Update ")),
-                        
+                        ), 
                       ],
                     ),
                   

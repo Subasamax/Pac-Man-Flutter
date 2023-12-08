@@ -1,4 +1,6 @@
 
+// ignore_for_file: non_constant_identifier_names
+
 import 'package:flame/collisions.dart';
 import 'package:flame/components.dart';
 import 'package:pacman/Components/Movement/DownLeft.dart';
@@ -14,14 +16,11 @@ import 'package:pacman/Components/Movement/TeleportLeft.dart';
 import 'package:pacman/Components/Movement/TeleportRight.dart';
 import 'dart:math';
 import 'package:pacman/Components/Wall.dart';
-import 'package:pacman/Components/player.dart';
 
 class Ghost extends SpriteComponent with CollisionCallbacks, HasGameRef {
 Ghost(this.ghost);
 
-
-  // 304.059 y
-  //TiledComponent map;
+  // variables
   int ghost;
   double maxSpeed = 60.0;
   int timer = 0;
@@ -30,6 +29,7 @@ Ghost(this.ghost);
   Vector2 CurrentPosition = Vector2(0,0);
   Vector2 StartPosition = Vector2(0,0);
 
+// lists of all possible move combinations on the map
   List<JoystickDirection> LeftRightDownUp = [JoystickDirection.left,JoystickDirection.right, JoystickDirection.down,JoystickDirection.up];
   List<JoystickDirection> LeftRight = [JoystickDirection.left,JoystickDirection.right];
   List<JoystickDirection> DownUp = [JoystickDirection.down,JoystickDirection.up];
@@ -42,9 +42,13 @@ Ghost(this.ghost);
   List<JoystickDirection> RightUp = [JoystickDirection.right, JoystickDirection.up];
   List<JoystickDirection> LeftDown = [JoystickDirection.left, JoystickDirection.down];
   List<JoystickDirection> currentPossibleMoves = [JoystickDirection.left,JoystickDirection.right];
-    JoystickDirection MovDirection = JoystickDirection.idle;
+
+  // joystick directions to idle
+  JoystickDirection MovDirection = JoystickDirection.idle;
   JoystickDirection Direction = JoystickDirection.idle;
   JoystickDirection PastDirection = JoystickDirection.idle;
+  
+  // variables
   Vector2 IntersectPos = Vector2(0, 0);
   Vector2 Pos = Vector2(0, 0);
   bool collided = false;
@@ -62,19 +66,16 @@ Ghost(this.ghost);
 @override
  Future<void> onLoad() async {
     await super.onLoad();
-    if (ghost == 1){
-    
-
-
-       sprite = await gameRef.loadSprite("Red_Ghost.png")..srcSize = Vector2.all(32);
-       timer = 50;
+    if (ghost == 1){ // if ghost is 1 load red ghost
+      sprite = await gameRef.loadSprite("Red_Ghost.png")..srcSize = Vector2.all(32);
+      timer = 50;
       StartPosition = Vector2(500, 340);
-       position = Vector2(500, 340);
-       size =  Vector2.all(24);
-       anchor = Anchor.center;
+      position = Vector2(500, 340);
+      size =  Vector2.all(24);
+      anchor = Anchor.center;
 
     }
-    else if (ghost == 2){
+    else if (ghost == 2){ // if ghost is 2 load blue ghost
       sprite = await gameRef.loadSprite("Blue_Ghost.png")..srcSize = Vector2.all(32);
       timer = 100;
       position = Vector2(525, 340);
@@ -82,26 +83,26 @@ Ghost(this.ghost);
       size =  Vector2.all(24);
       anchor = Anchor.center;
     }
-    else if (ghost == 3){
+    else if (ghost == 3){ // if ghost is 3 load orange ghost
       sprite = await gameRef.loadSprite("Orange_Ghost.png")..srcSize = Vector2.all(32);
       timer = 150;
-       position = Vector2(500, 360);
+      position = Vector2(500, 360);
       StartPosition = Vector2(500, 360);
-       size =  Vector2.all(24);
-       anchor = Anchor.center;
+      size =  Vector2.all(24);
+      anchor = Anchor.center;
     }
-    else if (ghost == 4){
+    else if (ghost == 4){ // if ghost is 4 load pink ghost
       sprite = await gameRef.loadSprite("Pink_Ghost.png")..srcSize = Vector2.all(32);
       timer = 200;
-       position = Vector2(525, 360);
-       StartPosition = Vector2(525, 360);
-       size =  Vector2.all(24);
-       anchor = Anchor.center;
+      position = Vector2(525, 360);
+      StartPosition = Vector2(525, 360);
+      size =  Vector2.all(24);
+      anchor = Anchor.center;
     }
 
-    startTimer = timer;
-   add(RectangleHitbox());
-   add(RectangleHitbox(
+    startTimer = timer; // sets timer
+    add(RectangleHitbox()); // adds hitbox
+    add(RectangleHitbox( // adds second hitbox for center of ghost
     position: Vector2(12,12),
     size: Vector2.all(1),
     anchor: Anchor.center,
@@ -110,7 +111,7 @@ Ghost(this.ghost);
   }
 
 
-
+  // makes sure ghost moves passively in current direction
   void PassiveMove(JoystickDirection mov, double dt){
        if (mov == JoystickDirection.up){
           currentMove = Vector2(0,dt*-maxSpeed);
@@ -130,6 +131,7 @@ Ghost(this.ghost);
         }      
  }
 
+  // chooses next direction based on list of moves and random number
   JoystickDirection ChoosePath(List<JoystickDirection> Moves){ 
     
       if (Moves.length == 2){
@@ -165,9 +167,10 @@ Ghost(this.ghost);
           }
         }
       }
-    return Moves[randNumber] ;
+    return Moves[randNumber] ; // return move
   }
 
+  // resets the ghost
    void softReset(){
        position = StartPosition;
        timer = startTimer;
@@ -181,22 +184,22 @@ Ghost(this.ghost);
  @override
   void update(double dt) {
     super.update(dt); //player movement
-    if (timer > 0) timer--;
-    if (timer == 0){
-      position = Vector2(495, 304.059 );
-      timer--;
-      wallCollision = false;
-      collided = false;
+    if (timer > 0) timer--; // if timer is greater than 0, decrement
+    if (timer == 0){ // if timer is 0
+      position = Vector2(495, 304.059 ); // spawn ghost
+      timer--; // decrement
+      wallCollision = false; // wall collision to false
+      collided = false; // collided to false
     }
-    if (timer < 0 && (newMove == true || start)){
+    if (timer < 0 && (newMove == true || start)){ // if timer is < 0 and time to move
         start = false;
-        MovDirection = ChoosePath(currentPossibleMoves);
+        MovDirection = ChoosePath(currentPossibleMoves); // chooses direciton
         if (MovDirection == JoystickDirection.up){
           currentPossibleMoves = DownUp;
           currentMove = Vector2(0,dt*-maxSpeed);
           position.add(currentMove);
           Direction = JoystickDirection.up;
-           PastDirection = JoystickDirection.down;
+          PastDirection = JoystickDirection.down;
         }
         else if (MovDirection == JoystickDirection.right){
           currentPossibleMoves = LeftRight;
@@ -222,7 +225,7 @@ Ghost(this.ghost);
 
     }
     else if (timer < 0 && wallCollision == false && collided == false){
-      PassiveMove(Direction, dt);
+      PassiveMove(Direction, dt); // if no new direction, passively move 
     }
   }
 
@@ -232,23 +235,23 @@ Ghost(this.ghost);
   @override
   void onCollision(Set<Vector2> intersectionPoints, PositionComponent other) {
     super.onCollision(intersectionPoints, other);
-    IntersectPos= Vector2(intersectionPoints.elementAt(0)[0].toInt().toDouble(), intersectionPoints.elementAt(0)[1].toInt().toDouble());
-    Pos= Vector2(position[0].toInt().toDouble(), position[1].toInt().toDouble());
-    if (other is Wall && !start){
+    IntersectPos= Vector2(intersectionPoints.elementAt(0)[0].toInt().toDouble(), intersectionPoints.elementAt(0)[1].toInt().toDouble()); // gets intersect
+    Pos= Vector2(position[0].toInt().toDouble(), position[1].toInt().toDouble()); // gets position
+    if (other is Wall && !start){ // if collided with wall, move opposite direction
       if (!collided ){
           wallCollision = true;
           collided = true;
           if (intersectionPoints.elementAt(1)[1] < position[1] && Direction == JoystickDirection.up){   
-           position[1] = intersectionPoints.elementAt(1)[1]+16;
+           position[1] = intersectionPoints.elementAt(1)[1]+18;
           }
           else  if (intersectionPoints.elementAt(1)[0] < position[0] && Direction == JoystickDirection.left){   
-           position[0] = intersectionPoints.elementAt(0)[0]+16; 
+           position[0] = intersectionPoints.elementAt(0)[0]+18; 
           }
           else  if (intersectionPoints.elementAt(1)[0] > position[0] && Direction == JoystickDirection.right){   
-           position[0] = intersectionPoints.elementAt(0)[0]-16; 
+           position[0] = intersectionPoints.elementAt(0)[0]-18; 
           }
          else  if (intersectionPoints.elementAt(0)[1] > position[1] && Direction == JoystickDirection.down){   
-           position[1] = intersectionPoints.elementAt(0)[1]-16; 
+           position[1] = intersectionPoints.elementAt(0)[1]-18; 
           }
           else{
             position = CurrentPosition;
@@ -256,6 +259,7 @@ Ghost(this.ghost);
         }
       
     }
+    // The rest of collision is for movement changes
     else if (other is UpDownrightLeft && Pos == IntersectPos&& !newMove){
        currentPossibleMoves = LeftRightDownUp;
        newMove = true;
@@ -328,39 +332,17 @@ Ghost(this.ghost);
       currentPossibleMoves = RightUp;
       wallCollision = false;
      }
-    else if (other is TeleportLeft){
+    else if (other is TeleportLeft){ // if teleport move position
       position = Vector2(80,304);
     }
-    else if (other is TeleportRight){
+    else if (other is TeleportRight){ // if teleport move position
       position = Vector2(940,304);
     }
-    else if (other is Player){
-      // if (other.Invincible){
-      //   position = StartPosition;
-      //   timer = 200;
-      //   start = true;
-      //   other.score += 100;
-      //   Direction = JoystickDirection.idle;
-      //   PastDirection = JoystickDirection.idle;
-      //   currentPossibleMoves = LeftRight;
-      // }
-      // else{
-      //   other.life--;
-      //   other.resetGame = true;
-      //   //softReset();
-        
-      // }
-    }
   }
-
-  // TODO 1
-
-
 
   @override
   void onCollisionEnd(PositionComponent other) {
     super.onCollisionEnd(other);
-      //collided = false;
       newMove = false;
       wallCollision = false;
       collided = false;
@@ -378,13 +360,6 @@ Ghost(this.ghost);
       else if (Direction == JoystickDirection.right){
          currentPossibleMoves = LeftRight;
       }
-
-
-      //CollidedDirection = JoystickDirection.idle;
-      //CollidedDirection = JoystickDirection.idle;
-    //print (collided);
-    
-    // TODO 2
   }
 }
 

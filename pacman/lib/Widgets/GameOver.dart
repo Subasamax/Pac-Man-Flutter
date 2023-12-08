@@ -8,12 +8,12 @@ import 'package:pacman/pac_man_game.dart';
 class GameOver_UI extends StatelessWidget {
   const GameOver_UI( this.gameref, {super.key});
   final PacMan gameref;
-    static const String overlay_GameOver = 'GameOver';
+  static const String overlay_GameOver = 'GameOver';
   static const String overlay_SaveScore = 'SaveScore';
   @override
     Widget build(BuildContext context) {
-     double width = MediaQuery.of(context).size.width;
-     double height = MediaQuery.of(context).size.height;
+     double width = MediaQuery.of(context).size.width;  // screen size
+     double height = MediaQuery.of(context).size.height;  // screen size
     
          return  Center(
           widthFactor: width/2,
@@ -57,7 +57,7 @@ class GameOver_UI extends StatelessWidget {
                               onPressed: (){
                                 gameref.overlays.remove(overlay_GameOver);
                                 gameref.overlays.add(overlay_SaveScore);
-                              },   // change to start game
+                              },   // changte to save score screen
                               style: ElevatedButton.styleFrom(
                                 backgroundColor: Colors.blue,
                               ), 
@@ -70,7 +70,7 @@ class GameOver_UI extends StatelessWidget {
                               onPressed: (){
                                 gameref.resumeEngine();
                                 gameref.overlays.remove(overlay_GameOver);
-                              },   // change to start game
+                              },   // change to game again
                               style: ElevatedButton.styleFrom(
                                 backgroundColor: Colors.blue,
                               ), 
@@ -82,7 +82,7 @@ class GameOver_UI extends StatelessWidget {
                             ElevatedButton(
                               onPressed: (){
                                 Navigator.pop(context);
-                              },   // change to start game
+                              },   // change to main menu
                               style: ElevatedButton.styleFrom(
                                 backgroundColor: Colors.blue,
                               ), 

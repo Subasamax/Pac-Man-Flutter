@@ -6,7 +6,6 @@ class LEADERBOARD extends StatelessWidget {
   LEADERBOARD({super.key});
     final Fire_storage firebase = Fire_storage();
     late final Future<QuerySnapshot<Object?>?> _list;
-  // This widget is the root of your application.
 
 
   List<Widget> getWidgets(List<Widget> wlist, AsyncSnapshot<QuerySnapshot<Object?>?> snapshot, BuildContext context) {
@@ -64,8 +63,6 @@ class LEADERBOARD extends StatelessWidget {
     double height = MediaQuery.of(context).size.height;
     return  Scaffold(
       body: Center(
-        // Center is a layout widget. It takes a single child and positions it
-        // in the middle of the parent.
         child: Column(
            mainAxisAlignment: MainAxisAlignment.spaceAround,
            crossAxisAlignment: CrossAxisAlignment.center,
@@ -136,11 +133,6 @@ class LEADERBOARD extends StatelessWidget {
           ],
         ),
       ),
-      // floatingActionButton: FloatingActionButton(
-      //   onPressed: _incrementCounter,
-      //   tooltip: 'Increment',
-      //   child: const Icon(Icons.add),
-      // ), // This trailing comma makes auto-formatting nicer for build methods.
     );
   }
 }

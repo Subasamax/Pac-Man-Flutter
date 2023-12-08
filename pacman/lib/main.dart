@@ -7,16 +7,16 @@ import 'pac_man_game.dart';
 import 'package:flutter/material.dart';
 
 void main() {
-   WidgetsFlutterBinding.ensureInitialized();
-   Flame.device.fullScreen();
-   Flame.device.setLandscape();
+   WidgetsFlutterBinding.ensureInitialized(); // ensures initialized
+   Flame.device.fullScreen(); // sets device to fullscreen
+   Flame.device.setLandscape(); // sets landscape 
   runApp(MaterialApp(
-    title: 'PACMAN',
+    title: 'PACMAN', // sets title
     initialRoute: '/',
     routes:{
-      '/': (context) => const Home(),
-      '/pacman': (context) => GameWidget(game: PacMan(context: context)),
-      '/leaderboard' : (context) =>  LEADERBOARD(), 
+      '/': (context) => const Home(), // define route to home
+      '/pacman': (context) => GameWidget(game: PacMan(context: context)), // game
+      '/leaderboard' : (context) =>  LEADERBOARD(),  // leaderboard
     }
    )
   );

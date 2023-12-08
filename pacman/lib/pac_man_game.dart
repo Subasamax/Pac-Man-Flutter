@@ -29,11 +29,11 @@ import 'package:flame/palette.dart';
 
 class PacMan extends FlameGame with HasCollisionDetection {
   PacMan({required this.context});
-  late final JoystickComponent joystick;
-  late TiledComponent mapComponent;
-  late final CameraComponent cameraComponent;
-  BuildContext context;
-  final pauseOverlayIdentifier = 'GameOver';
+  late final JoystickComponent joystick; // joystick
+  late TiledComponent mapComponent; // mapcomponent from Tiled
+  late final CameraComponent cameraComponent; // camera component
+  BuildContext context; // creates a build context passed into this class
+  final GameOver_Overlay = 'GameOver'; // defines the name of an overlay
 
   @override
   late final World world;
@@ -48,27 +48,14 @@ class PacMan extends FlameGame with HasCollisionDetection {
   late List<TiledObject> Whitecoins;
   late List<Component> all_coins = [];
 
-      final GameOver = TextPaint(
-    style:  const TextStyle(
-          color: Colors.red,
-          fontSize: 100
-        ),
-        
-  );
-  late TextComponent GameOverText = TextComponent(
-    text: "Game Over",
-    position: Vector2(300,250),
-    textRenderer: GameOver
-  );
-
-
-
-  
   void startGame(TiledComponent mapComponent){
+    // sets ghost priority in render
     red.priority = 1;
     blue.priority = 1;
     orange.priority = 1;
     pink.priority = 1;
+
+    // adding components for walls and turns
     world.add(mapComponent);
     world.add(Wall(mapComponent));
     world.add(UpDownrightLeft(mapComponent));
@@ -82,6 +69,7 @@ class PacMan extends FlameGame with HasCollisionDetection {
     world.add(UpRight(mapComponent));
     world.add(TeleportLeft(mapComponent));
     world.add(TeleportRight(mapComponent));
+    // adding coins to map
     coins =  mapComponent.tileMap.getLayer<ObjectGroup>("Coins")!.objects;
      for (var coinObject in coins){ 
        Coin temp = Coin(coin: coinObject);
@@ -89,6 +77,7 @@ class PacMan extends FlameGame with HasCollisionDetection {
        all_coins.add(temp);
        world.add(temp);
      }
+     //adding white coins to map
     Whitecoins = mapComponent.tileMap.getLayer<ObjectGroup>("WhiteCoin")!.objects;
     for (var coinObject in Whitecoins){ 
       WhiteCoin temp = WhiteCoin(coin: coinObject);
@@ -96,10 +85,13 @@ class PacMan extends FlameGame with HasCollisionDetection {
       all_coins.add(temp);
       world.add(temp);
     }
+
+    // adding ghosts
     world.add(red);
     world.add(blue);
     world.add(orange);
     world.add(pink);
+    // defining joysitck
     final knobPaint = BasicPalette.blue.withAlpha(200).paint();
     final backgroundPaint = BasicPalette.blue.withAlpha(100).paint();
     joystick = JoystickComponent(
@@ -108,36 +100,38 @@ class PacMan extends FlameGame with HasCollisionDetection {
        knob: CircleComponent(radius: 40, paint: knobPaint),
        background: CircleComponent(radius: 80, paint: backgroundPaint),
     );
+    // creating and adding player
     player = Player(joystick, mapComponent);
     player.priority = 1;
     world.add(player);
+    // add ui and joystick to world
     world.add(joystick);
     world.add(UI);
   }
 
   void NextLevel(){
-    player.reset();
-    for (var object in all_coins){
+    player.reset(); // resets player
+    for (var object in all_coins){ // adds all coins back into world
         world.add(object);
     }
-    softReset();
+    softReset(); // calls soft reset
   }
 
 
   void hardReset(){
     GameOverMessage();
-    for (var object in all_coins){
+    for (var object in all_coins){ // checks if a coin is gone, if so , readd to world
       if(object.isRemoved != false){
         world.add(object);
       }
     }
-    softReset();
-    UI.level = 1;
-    player.life = 3;
-    player.score = 0;
+    softReset(); // calls soft reset
+    UI.level = 1; // updates UI level to 1
+    player.life = 3; // resets player life
+    player.score = 0; // resets player score
   }
 
-  void softReset(){
+  void softReset(){ // calls soft reset for ghosts and player
    red.softReset();
    blue.softReset();
    orange.softReset();
@@ -150,23 +144,22 @@ class PacMan extends FlameGame with HasCollisionDetection {
 
   @override
   Future<void> onLoad() async {
-    world = World();
-    cameraComponent = CameraComponent.withFixedResolution(
+    world = World(); // creates world
+    cameraComponent = CameraComponent.withFixedResolution( // defines camera component
        world: world,
        width: 1300,
        height: 600,
      );
-     cameraComponent.viewfinder.anchor = Anchor.topLeft;
-     //cameraComponent.viewport = FixedResolutionViewport(resolution: Vector2(1200, 600));
-     addAll([world, cameraComponent]);
-    var mapComponent = await TiledComponent.load('map.tmx', Vector2(32, 32));
-    startGame(mapComponent);
+     cameraComponent.viewfinder.anchor = Anchor.topLeft; // sets camera viewfinder anchor
+     addAll([world, cameraComponent]); // adds world and camera 
+    var mapComponent = await TiledComponent.load('map.tmx', Vector2(32, 32)); // loads map
+    startGame(mapComponent); // starts game with loaded mapcomponent
   }
 
-   Future<void> GameOverMessage() async {
-    pauseEngine();
-    overlays.add(pauseOverlayIdentifier);
-    player.reset();
+  Future<void> GameOverMessage() async {
+    pauseEngine(); // pauses the game engine
+    overlays.add(GameOver_Overlay); // adds an overlay to the game
+    player.reset(); // resets the player
   }
 
     
@@ -174,20 +167,20 @@ class PacMan extends FlameGame with HasCollisionDetection {
   @override
   void update(double dt) {
     super.update(dt);
-    Score = player.score;
-    UI.Score = player.score;
-    if (player.life < 0){
-      hardReset();    
+    Score = player.score; // updates the score
+    UI.Score = player.score; // updates the ui score
+    if (player.life < 0){ // if player losses all lifes and dies
+      hardReset();     // hard reset the game
     }
-    else if (player.resetGame == true){
-      softReset();
+    else if (player.resetGame == true){ //else if player needs the board reset, 
+      softReset(); // soft reset the game
     }
-    else if (player.coinsCollected == all_coins.length){
-      player.coinsCollected = 0;
-      UI.level++;
-      NextLevel();
+    else if (player.coinsCollected == all_coins.length){ // if player gets all collectables
+      player.coinsCollected = 0; // set coins collected to 0
+      UI.level++; // up the level
+      NextLevel(); // set the next level
     }
-    UI.lives = player.life;
+    UI.lives = player.life; // updates the UI lives
 
   }  
 }

@@ -23,29 +23,27 @@ class Fire_storage{
 
 
   Future<QuerySnapshot<Object?>> getData(FirebaseFirestore instance) async{
-    
-    QuerySnapshot querySnapshot = await instance.collection('Leaderboard').get();
-    final scoreRef = instance.collection("Leaderboard");
-    scoreRef.orderBy("Score", descending: true);
-    Query query = scoreRef.orderBy("Score", descending: true);
-    querySnapshot = await query.get();
-    return querySnapshot;
+    QuerySnapshot querySnapshot = await instance.collection('Leaderboard').get(); // gets snapshot of collection
+    Query query =  instance.collection("Leaderboard").orderBy("Score", descending: true);  // orders the leaderboard based on score
+    querySnapshot = await query.get(); // gets snapshot of query
+    return querySnapshot; // return snapshot
  }
 
   bool get isInitialized => _initialized;
   
+  // writes the leaderboard
   Future<bool> WriteLeaderboard(String DisplayName, int Score, String Location) async {
     try {
       if (!isInitialized){
         await initializDefault();
       }
-      FirebaseFirestore firestore = FirebaseFirestore.instance;
-       DocumentSnapshot querySnapshot = await  firestore.collection("Leaderboard").doc("LeaderboardSize").get();
-       int count = querySnapshot.get('count')+1;
+      FirebaseFirestore firestore = FirebaseFirestore.instance; // gets instance
+      DocumentSnapshot querySnapshot = await  firestore.collection("Leaderboard").doc("LeaderboardSize").get(); // gets size of leaderboard
+      int count = querySnapshot.get('count')+1; // sets count
        
-      var data = {"DisplayName": DisplayName, "Score": Score, "Location": Location};
-      var countData = {"count": count};
-      await firestore.collection("Leaderboard").doc(count.toString()).set(data).then((value){
+      var data = {"DisplayName": DisplayName, "Score": Score, "Location": Location}; // creates data to write
+      var countData = {"count": count}; // creates count data to write
+      await firestore.collection("Leaderboard").doc(count.toString()).set(data).then((value){ // sets data in firebase
       firestore.collection("Leaderboard").doc('LeaderboardSize').set(countData);
         if (kDebugMode){
               print("Added Data for $DisplayName to Database");
@@ -65,8 +63,7 @@ class Fire_storage{
     return false;
   }
 
-
-
+  // reads the firebase leaderboard
   Future<QuerySnapshot<Object?>?> readFirebaseForm() async{
     try{
       if (!isInitialized){
